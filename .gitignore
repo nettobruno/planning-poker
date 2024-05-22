@@ -2,12 +2,9 @@
 
 # dependencies
 /node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
+yarn.lock
+package-lock.json
 
-# testing
-/coverage
 
 # next.js
 /.next/
