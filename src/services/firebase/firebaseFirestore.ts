@@ -24,7 +24,7 @@ export const listenToCollection = (
   const collectionRef = collection(db, collectionName);
   return onSnapshot(collectionRef, 
     (snapshot: QuerySnapshot) => {
-      const data = snapshot.docs.map(doc => doc.data());
+      const data = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
       callback(data);
     }, 
     (error) => {
