@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { listenToCollection, clearAllVotes, getUserById } from '../services/firebase/firebaseFirestore'
+import { listenToCollection, clearAllVotes, getUserById, updateUserVote } from '../services/firebase/firebaseFirestore'
 
 export default function Vote() {
   const router = useRouter();
@@ -10,7 +10,21 @@ export default function Vote() {
 
   const [data, setData] = useState<any>([]);
   const [user, setUser] = useState<any>([]);
+  const [vote, setVote] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
+
+  const handleVoteUpdate = async () => {
+    setLoading(true);
+
+    try {
+      await updateUserVote(userId as string, vote);
+    } catch (error) {
+      console.log('Erro ao atualizar voto. Por favor, tente novamente.');
+    } finally {
+      setLoading(false);
+      setVote('');
+    }
+  };
 
   const testClearAges = async () => {
     try {
@@ -69,10 +83,25 @@ export default function Vote() {
 
       {data.map((item: any, index: any) => (
         <ul key={index}>
-          <li>{item.name}</li>
+          <li style={item.id === userId ? { color: 'red' } : {}}>{item.name}</li>
           <li>{item.vote}</li>
         </ul>    
       ))}
+
+      <form onSubmit={handleVoteUpdate}>
+        <input
+          type="string"
+          placeholder="Voto"
+          id="vote"
+          value={vote}
+          onChange={(e) => setVote(e.target.value)}
+          required
+        />
+
+        <button type="submit" disabled={loading}>
+          {loading ? 'Salvando...' : 'Salvar'}
+        </button>
+      </form>
 
       <button onClick={() => testClearAges()}>Limpar todos os votos</button>
     </main>
