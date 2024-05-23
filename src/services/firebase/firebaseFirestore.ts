@@ -67,3 +67,14 @@ export const getUserById = async (userId: string) => {
     throw error;
   }
 };
+
+export const updateUserVote = async (userId: string, newVote: string): Promise<void> => {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    await updateDoc(userDocRef, { vote: newVote });
+    console.log('Voto atualizado com sucesso');
+  } catch (error) {
+    console.error('Erro ao atualizar voto:', error);
+    throw error;
+  }
+};
