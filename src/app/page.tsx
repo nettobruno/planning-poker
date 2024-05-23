@@ -1,44 +1,47 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { listenToCollection } from '../services/firebase/firebaseFirestore'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { addUser } from '../services/firebase/firebaseFirestore'
 
 export default function Home() {
-  const [data, setData] = useState<any>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [name, setName] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    const getItemsFirebase = listenToCollection(
-      'users',
-      (dataFromFirestore) => {
-        setData(dataFromFirestore);
-        setLoading(false);
-      },
-      (error) => {
-        console.error('Erro ao ouvir dados do Firestore:', error);
-      }
-    );
+  const router = useRouter();
 
-    return () => {
-      getItemsFirebase();
-    };
-  }, []);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
 
-  if (loading) {
-    return <div>Carregando...</div>;
-  }
+    try {
+      const userID = await addUser({ name, vote: '' });
+      router.push(`/vote?${userID}`);
+    } catch (error) {
+      console.error('Erro ao salvar nome de usuário:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main>
-      <h1>Hello World</h1>
+      <h1>Qual é o seu nome?</h1>
 
-      {data.map((item: any, index: any) => (
-        <ul key={index}>
-          <li>{item.name}</li>
-          <li>{item.lastname}</li>
-          <li>{item.age}</li>
-        </ul>    
-      ))}
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Nome"
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+
+        <button type="submit" disabled={loading}>
+          {loading ? 'Salvando...' : 'Salvar'}
+        </button>
+      </form>
     </main>
   );
 }
