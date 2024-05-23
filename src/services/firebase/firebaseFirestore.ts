@@ -6,7 +6,9 @@ import {
   DocumentData, 
   addDoc, 
   getDocs, 
-  updateDoc
+  updateDoc,
+  doc,
+  getDoc
 } from 'firebase/firestore';
 
 interface User {
@@ -49,4 +51,19 @@ export const clearAllVotes = async (collectionName: string): Promise<void> => {
       vote: '' 
     });
   });
+};
+
+export const getUserById = async (userId: string) => {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists()) {
+      return { id: userDoc.id, ...userDoc.data() };
+    } else {
+      console.log('Usuário não encontrado.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+    throw error;
+  }
 };

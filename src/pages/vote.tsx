@@ -1,10 +1,15 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { listenToCollection, clearAllVotes } from '../services/firebase/firebaseFirestore'
+import { useRouter } from 'next/router';
+import { listenToCollection, clearAllVotes, getUserById } from '../services/firebase/firebaseFirestore'
 
 export default function Vote() {
+  const router = useRouter();
+  const { userId } = router.query;
+
   const [data, setData] = useState<any>([]);
+  const [user, setUser] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const testClearAges = async () => {
@@ -15,6 +20,21 @@ export default function Vote() {
       console.error('Erro ao limpar votos:', error);
     }
   }
+
+  const fetchUser = async (userId: string) => {
+    try {
+      const userData = await getUserById(userId);
+      if (userData) {
+        setUser(userData);
+      } else {
+        console.log('Usuário não encontrado.');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar usuário:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const getItemsFirebase = listenToCollection(
@@ -32,6 +52,12 @@ export default function Vote() {
       getItemsFirebase();
     };
   }, []);
+
+  useEffect(() => {
+    if (userId) {
+      fetchUser(userId as string);
+    }
+  }, [userId]);
 
   if (loading) {
     return <div>Carregando...</div>;

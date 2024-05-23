@@ -16,7 +16,7 @@ export default function Home() {
 
     try {
       const userID = await addUser({ name, vote: '' });
-      router.push(`/vote?${userID}`);
+      router.push(`/vote?userId=${userID}`);
     } catch (error) {
       console.error('Erro ao salvar nome de usuário:', error);
     } finally {
