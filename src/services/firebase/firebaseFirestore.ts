@@ -40,3 +40,13 @@ export const addUser = async (user: User) => {
     console.error("Error adding user: ", e);
   }
 };
+
+export const clearAllVotes = async (collectionName: string): Promise<void> => {
+  const querySnapshot = await getDocs(collection(db, collectionName));
+
+  querySnapshot.forEach(async (doc) => {
+    await updateDoc(doc.ref, {
+      vote: '' 
+    });
+  });
+};
